@@ -30,7 +30,7 @@ const io = new Server(server, {
     }
 });
 
-const pubClient = createClient({ url: 'redis://localhost:6379' });
+const pubClient = createClient({ url: process.env.REDIS_URL });
 const subClient = pubClient.duplicate();
 
 await pubClient.connect();
