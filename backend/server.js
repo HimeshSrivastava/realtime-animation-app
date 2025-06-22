@@ -2,18 +2,19 @@ import { Server } from 'socket.io';
 import express from 'express';
 import cors from 'cors';
 import dotenv from "dotenv";
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
+import ConnectMongoose from './db/ConnectMongoose.js';
+import authRoutes from "./routes/auth.routes.js";
 
-const app = express();
 dotenv.config();
 
+const app = express();
 app.use(cors({
-    origin: 'http://localhost:5173', 
+    origin: 'http://localhost:5173',
     credentials: true
 }));
-app.use(express.json()); 
-
-import authRoutes from "./routes/auth.routes.js";
-import ConnectMongoose from './db/ConnectMongoose.js';
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 
@@ -24,10 +25,18 @@ const server = app.listen(process.env.PORT, () => {
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173', 
+        origin: 'http://localhost:5173',
         methods: ["GET", "POST"]
     }
 });
+
+const pubClient = createClient({ url: 'redis://localhost:6379' });
+const subClient = pubClient.duplicate();
+
+await pubClient.connect();
+await subClient.connect();
+
+io.adapter(createAdapter(pubClient, subClient));
 
 const clients = new Map();
 
@@ -62,14 +71,7 @@ io.on('connection', (socket) => {
                 }
             }
 
-            const animationData = {
-                x: 100,
-                y: 100,
-                width,
-                height,
-                color: '#ff0000'
-            };
-
+            const animationData = { x: 100, y: 100, width, height, color: '#ff0000' };
             socket.emit('animation', animationData);
         }, 100);
 
@@ -88,4 +90,4 @@ io.on('connection', (socket) => {
     });
 });
 
-console.log('Socket.IO server running with REST API and WebSocket on port 8080');
+console.log('Socket.IO + Redis Adapter setup complete. Scalable for multi-server!');

@@ -1,4 +1,3 @@
-import React from 'react'
 
 const Box = ({ x, y, color})=>{
     const style ={
