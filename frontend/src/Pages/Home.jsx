@@ -40,7 +40,7 @@ const Home = () => {
   console.log(animationState);
 
   return (
-    <>
+
    <div style={{
   minHeight: '100vh',              
   backgroundColor: 'white',      
@@ -125,9 +125,8 @@ const Home = () => {
  </div>
 
   </div>
-</div>
+   </div>  
 
-    </>
   );
 };
 
