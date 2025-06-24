@@ -58,7 +58,9 @@ const Home = () => {
     top: 0,
     width: `${animationState.width}px`,
     height: `${animationState.height}px`,
-    background: `linear-gradient(${animationState.gradient?.direction}, ${animationState.gradient.colors.map(c => `${c.color} ${c.offset * 100}%`).join(', ')})`,
+     background: animationState.gradient?.colors?.length
+      ? `linear-gradient(${animationState.gradient.direction}, ${animationState.gradient.colors.map(c => `${c.color} ${c.offset * 100}%`).join(', ')})`
+      : 'transparent',  
     borderRadius: animationState.borderRadius,
     transition: 'all 0.2s linear',
     WebkitMaskImage: animationState.WebkitMaskImage,

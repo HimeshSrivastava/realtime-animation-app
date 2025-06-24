@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
             clients.delete(socket.id);
         }
         const MAX_WIDTH = 1460;
-        const MAX_HEIGHT = 350;
+        const MAX_HEIGHT = 400;
 
         let width = 0;
         let height = 0;
@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
         const interval = setInterval(() => {
             if (expanding) {
                 width += 55;
-                if (height < MAX_HEIGHT) height += 10;
+                if (height < MAX_HEIGHT) height += 12;
                 if (width >= MAX_WIDTH) expanding = false;
             } else {
                 height -= 7;
