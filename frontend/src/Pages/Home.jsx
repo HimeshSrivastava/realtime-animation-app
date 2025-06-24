@@ -8,7 +8,14 @@ const Home = () => {
     y: 0,
     width: 0,
     height: 0,
-    color: '#3b82f6'
+    gradient: {
+        type: '',
+        direction: '',
+        colors: [] // 👈 completely empty colors array
+    },
+    maskImage: '',
+    WebkitMaskImage: '',
+    borderRadius: ''
   });
 
   const socketRef = useRef();
@@ -17,7 +24,10 @@ const Home = () => {
     socketRef.current = io('http://localhost:8080');
 
     socketRef.current.on('animation', (data) => {
-      setAnimationState(data);
+      setAnimationState((prev) => ({
+    ...prev,
+    ...data
+  }));
     });
 
     return () => {
@@ -27,6 +37,7 @@ const Home = () => {
 
   const handleStart = () => socketRef.current.emit('start');
   const handleStop = () => socketRef.current.emit('stop');
+  console.log(animationState);
 
   return (
     <>
@@ -45,13 +56,17 @@ const Home = () => {
     position: 'absolute',
     left: `calc(50% - ${animationState.width / 2}px)`, 
     top: 0,
-    width: animationState.width,
-    height: animationState.height,
-    background: 'linear-gradient(to right, #60a5fa, #a78bfa, #f472b6, #fb923c)',
+    width: `${animationState.width}px`,
+    height: `${animationState.height}px`,
+    background: `linear-gradient(${animationState.gradient?.direction}, ${animationState.gradient.colors.map(c => `${c.color} ${c.offset * 100}%`).join(', ')})`,
+    borderRadius: animationState.borderRadius,
     transition: 'all 0.2s linear',
-    borderRadius: '0 0 16px 16px',
-  boxShadow: '0 8px 20px rgba(0,0,0,0.4)' 
-  }} />
+    WebkitMaskImage: animationState.WebkitMaskImage,
+    maskImage: animationState.maskImage,
+    boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
+    zIndex: 5
+}} />
+
 
   <h1 
   style={{

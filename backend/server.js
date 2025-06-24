@@ -30,8 +30,10 @@ const io = new Server(server, {
     }
 });
 
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-const pubClient = createClient({ url: redisUrl });
+
+const pubClient = createClient({ 
+   url:'redis://localhost:6379'
+});
 const subClient = pubClient.duplicate();
 
 await pubClient.connect();
@@ -49,8 +51,8 @@ io.on('connection', (socket) => {
             clearInterval(clients.get(socket.id));
             clients.delete(socket.id);
         }
-        const MAX_WIDTH = 1500;
-        const MAX_HEIGHT = 100;
+        const MAX_WIDTH = 1460;
+        const MAX_HEIGHT = 350;
 
         let width = 0;
         let height = 0;
@@ -59,10 +61,10 @@ io.on('connection', (socket) => {
         const interval = setInterval(() => {
             if (expanding) {
                 width += 55;
-                if (height < MAX_HEIGHT) height += 5;
+                if (height < MAX_HEIGHT) height += 10;
                 if (width >= MAX_WIDTH) expanding = false;
             } else {
-                height -= 5;
+                height -= 7;
                 if (height <= 0) {
                     width = 0;
                     height = 0;
@@ -72,9 +74,33 @@ io.on('connection', (socket) => {
                 }
             }
 
-            const animationData = { x: 100, y: 100, width, height, color: '#ff0000' };
-            socket.emit('animation', animationData);
-        }, 100);
+
+    const animationData = {
+    x: 100,
+    y: 200,
+    width: width,
+    height: height,
+    gradient: {
+        type: 'linear',
+        direction: 'to right', 
+        colors: [
+            { offset: 0, color: '#00bfff' },
+            { offset: 0.25, color: '#6a5acd' },
+            { offset: 0.5, color: '#da70d6' },
+            { offset: 0.75, color: '#ff69b4' },
+            { offset: 1, color: '#ff4500' }
+        ]
+    },
+    maskImage: `linear-gradient(
+    rgba(0, 0, 0, 0.8) 8%, 
+    rgba(0, 0, 0, 0) 25%,
+    rgba(0, 0, 0, 0) 0%)`,
+    borderRadius:'0'
+};
+
+    
+    socket.emit('animation', animationData);
+}, 80); 
 
         clients.set(socket.id, interval);
     });
